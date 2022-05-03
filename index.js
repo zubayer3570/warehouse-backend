@@ -23,7 +23,7 @@ const run = () => {
             const collection = client.db('warehouse').collection('car-collection')
             const cursor = collection.find({})
             const cars = await cursor.toArray()
-            res.send(cursor)
+            res.send(cars)
         })
     } finally {
 
