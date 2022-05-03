@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
     res.send('server is working fine')
 })
 //mongodb
-const uri = `mongodb+srv://database-user-1:${process.env.DATABASE_PASSWORD}@cluster0.1f3iy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+const uri = `mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 const client = new MongoClient(uri)
 const run = () => {
     try {
