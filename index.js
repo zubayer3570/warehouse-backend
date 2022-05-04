@@ -20,8 +20,13 @@ const run = () => {
     try {
         client.connect()
         const collection = client.db('warehouse').collection('car-collection')
-        app.get('/items', async (req, res) => {
-            const cursor = collection.find({}).limit(6)
+        app.get('/items/:amount', async (req, res) => {
+            const amount = req.params.amount
+            if (amount === 'all') {
+                cursor = collection.find({})
+            } else {
+                cursor = collection.find({}).limit(parseInt(amount))
+            }
             const cars = await cursor.toArray()
             res.send(cars)
         })
@@ -49,6 +54,21 @@ const run = () => {
             })
             res.send(result)
 
+        })
+        app.post('/restock', async (req, res) => {
+            const { increaseBy, id } = req.body
+            const query = { _id: ObjectId(id) }
+            const item = await collection.findOne(query)
+            const newQuantity = item.quantity + parseInt(increaseBy)
+            await collection.updateOne(query, {
+                $set: { quantity: newQuantity }
+            })
+        })
+        app.post('/delete', async (req, res) => {
+            const query = {
+                _id: ObjectId(req.body.id)
+            }
+            await collection.deleteOne(query)
         })
     } finally {
 
