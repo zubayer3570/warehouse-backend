@@ -20,6 +20,7 @@ const run = () => {
     try {
         client.connect()
         const collection = client.db('warehouse').collection('car-collection')
+        //get
         app.get('/items/:amount', async (req, res) => {
             const amount = req.params.amount
             if (amount === 'all') {
@@ -27,11 +28,6 @@ const run = () => {
             } else {
                 cursor = collection.find({}).limit(parseInt(amount))
             }
-            const cars = await cursor.toArray()
-            res.send(cars)
-        })
-        app.get('/allitems', async (req, res) => {
-            const cursor = collection.find({})
             const cars = await cursor.toArray()
             res.send(cars)
         })
@@ -43,6 +39,7 @@ const run = () => {
             const result = await collection.findOne(query)
             res.send(result)
         })
+        //post
         app.post('/inventory/:id', async (req, res) => {
             const id = req.params.id
             const query = {
@@ -70,9 +67,22 @@ const run = () => {
             }
             await collection.deleteOne(query)
         })
-    } finally {
-
-    }
+        app.post('/add-item', async (req, res) => {
+            const doc = req.body;
+            const result = await collection.insertOne(doc)
+            console.log(result.insertedId)
+            res.send(result.insertedId)
+        })
+        app.post('/my-items', async (req, res) => {
+            const { email } = req.body;
+            const query = {
+                email: email
+            }
+            const cursor = collection.find(query)
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+    } finally { }
 }
 run()
 //listen
