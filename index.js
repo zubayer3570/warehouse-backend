@@ -35,9 +35,12 @@ const client = new MongoClient(uri)
 const run = () => {
     try {
         client.connect()
+        //watches collection
         const collection = client.db('watch-geek').collection('watches')
+        //comments collection
         const commentsCollection = client.db('watch-geek').collection('comments')
         //get
+        //dynamically get any amount of data
         app.get('/items/:amount', async (req, res) => {
             const amount = req.params.amount
             if (amount === 'all') {
@@ -48,6 +51,7 @@ const run = () => {
             const cars = await cursor.toArray()
             res.send(cars)
         })
+        //item details
         app.get('/inventory/:id', async (req, res) => {
             const id = req.params.id
             const query = {
@@ -57,6 +61,7 @@ const run = () => {
             res.send(result)
         })
         //post
+        //delivered
         app.post('/inventory/:id', async (req, res) => {
             const id = req.params.id
             const query = {
@@ -69,6 +74,7 @@ const run = () => {
             res.send(result)
 
         })
+        //restock
         app.post('/restock', async (req, res) => {
             const { increaseBy, id } = req.body
             const query = { _id: ObjectId(id) }
@@ -79,16 +85,19 @@ const run = () => {
             })
             res.send({})
         })
+        //delete
         app.post('/delete', async (req, res) => {
             const query = {
                 _id: ObjectId(req.body.id)
             }
             await collection.deleteOne(query)
         })
+        //add item
         app.post('/add-item', async (req, res) => {
             const { doc } = req.body;
             await collection.insertOne(doc)
         })
+        //my items
         app.get('/my-items', jwtVerify, async (req, res) => {
             const { email } = req.query;
             const decodedEmail = req.decoded.email
@@ -103,6 +112,7 @@ const run = () => {
             }
 
         })
+        //creating jwt token
         app.post('/login', (req, res) => {
             const { email } = req.body;
             const accessToken = jwt.sign({ email }, process.env.SECRET_KEY, {
@@ -110,6 +120,7 @@ const run = () => {
             })
             res.send({ accessToken })
         })
+        //comments
         app.get('/comments', async (req, res) => {
             const cursor = commentsCollection.find({})
             const comments = await cursor.toArray()
