@@ -96,6 +96,7 @@ const run = () => {
         app.post('/add-item', async (req, res) => {
             const { doc } = req.body;
             await collection.insertOne(doc)
+            res.send({})
         })
         //my items
         app.get('/my-items', jwtVerify, async (req, res) => {
