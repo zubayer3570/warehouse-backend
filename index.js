@@ -87,7 +87,7 @@ const run = () => {
             const { doc } = req.body;
             await collection.insertOne(doc)
         })
-        app.get('/my-items', async (req, res) => {
+        app.get('/my-items', jwtVerify, async (req, res) => {
             const { email } = req.query;
             const decodedEmail = req.decoded.email
             if (email === decodedEmail) {
