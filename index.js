@@ -36,6 +36,7 @@ const run = () => {
     try {
         client.connect()
         const collection = client.db('watch-geek').collection('watches')
+        const commentsCollection = client.db('watch-geek').collection('comments')
         //get
         app.get('/items/:amount', async (req, res) => {
             const amount = req.params.amount
@@ -108,6 +109,11 @@ const run = () => {
                 expiresIn: '1h'
             })
             res.send({ accessToken })
+        })
+        app.get('/comments', async (req, res) => {
+            const cursor = commentsCollection.find({})
+            const comments = await cursor.toArray()
+            res.send(comments)
         })
     } finally { }
 }
