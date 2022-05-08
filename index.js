@@ -17,7 +17,8 @@ app.get('/', (req, res) => {
 //jwt verify
 const jwtVerify = (req, res, next) => {
     const accessToken = req.headers.authorization.split(' ')[1]
-    if (accessToken) {
+    console.log(accessToken)
+    if (!accessToken) {
         return res.status(401).send({ message: "Unauthorized Request" })
     }
     jwt.verify(accessToken, process.env.SECRET_KEY, (error, decoded) => {
@@ -90,6 +91,7 @@ const run = () => {
         app.get('/my-items', jwtVerify, async (req, res) => {
             const { email } = req.query;
             const decodedEmail = req.decoded.email
+            console.log(decodedEmail, email)
             if (email === decodedEmail) {
                 const query = { email }
                 const cursor = collection.find(query)
@@ -101,7 +103,7 @@ const run = () => {
 
         })
         app.post('/login', (req, res) => {
-            const email = req.body;
+            const { email } = req.body;
             const accessToken = jwt.sign({ email }, process.env.SECRET_KEY, {
                 expiresIn: '1h'
             })
