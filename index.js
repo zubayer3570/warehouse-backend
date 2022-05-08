@@ -14,6 +14,20 @@ const port = process.env.PORT || 5000
 app.get('/', (req, res) => {
     res.send('server is working fine')
 })
+//jwt verify
+const jwtVerify = (req, res, next) => {
+    const accessToken = req.headers.authorization.split(' ')[1]
+    if (accessToken) {
+        return res.status(401).send({ message: "Unauthorized Request" })
+    }
+    jwt.verify(accessToken, process.env.SECRET_KEY, (error, decoded) => {
+        if (error) {
+            return "An errr occured"
+        }
+        req.decoded = decoded
+    })
+    next()
+}
 //mongodb
 const uri = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@cluster0.1f3iy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 const client = new MongoClient(uri)
@@ -74,11 +88,17 @@ const run = () => {
             await collection.insertOne(doc)
         })
         app.get('/my-items', async (req, res) => {
-            const email = req.query.email;
-            const query = { email }
-            const cursor = collection.find(query)
-            const result = await cursor.toArray()
-            res.send(result)
+            const { email } = req.query;
+            const decodedEmail = req.decoded.email
+            if (email === decodedEmail) {
+                const query = { email }
+                const cursor = collection.find(query)
+                const result = await cursor.toArray()
+                res.send(result)
+            } else {
+                res.status(403).send({ message: "Forbinner access" })
+            }
+
         })
         app.post('/login', (req, res) => {
             const email = req.body;
